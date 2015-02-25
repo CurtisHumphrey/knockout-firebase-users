@@ -48,6 +48,10 @@ define (require) ->
         expect _.isFunction fire_auth.Login
           .toBeTruthy()
 
+      it 'Should have a Logout function', ->
+        expect _.isFunction fire_auth.Logout
+          .toBeTruthy()
+
       it 'Should have a Create_User function', ->
         expect _.isFunction fire_auth.Create_User
           .toBeTruthy()
@@ -56,7 +60,7 @@ define (require) ->
         expect _.isObject fire_auth.user
           .toBeTruthy()
 
-      it 'Should have a user id observable', ->
+      it 'Should have a user_id observable', ->
         expect fire_auth.user_id
           .toBeDefined()
 
@@ -83,7 +87,7 @@ define (require) ->
           auth: {}
 
         expect(fire_auth.valid()).toBeTruthy()
-
+        expect(fire_auth.user_id()).toEqual('u001')
 
       it 'Should load the user\'s data from both public and private locations', ->
         fire_ref.changeAuthState
@@ -122,19 +126,30 @@ define (require) ->
         expect( fire_ref.child('users/private').child('u002').getData().awaiting_approvial).toEqual true
 
 
-    xdescribe 'Log out', ->
-      beforeEach ->
+      describe 'Log out', ->
+        beforeEach ->
+          fire_ref.changeAuthState
+            uid: 'u001'
+            provider: 'password'
+            token: 'token'
+            expires: Math.floor(new Date() / 1000) + 24 * 60 * 60
+            auth: {}
+
+          fire_auth.Logout()
+
+          fire_ref.changeAuthState null
 
 
-      it 'Should be able to logout a user', ->
+        it 'Should be able to logout a user', ->
+          expect(fire_auth.valid()).toBeFalsy()
+          expect(fire_auth.user_id()).toBeFalsy()
 
+        it 'Should clear the user\'s data', ->
+          expect( fire_auth.user.picture()).toEqual null
+          expect( fire_auth.user.awaiting_approvial()).toEqual null
 
-      it 'Should flag that the user is not authorized', ->
-
-
-      it 'Should clear the user\'s data', ->
-
-      it 'Should clear the user\'s uid', ->
+          expect( fire_auth.user.display_name()).toEqual null
+          expect( fire_auth.user.email()).toEqual null
 
     xdescribe 'Recover Password', ->
 

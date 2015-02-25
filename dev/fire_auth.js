@@ -85,6 +85,7 @@
       Fire_Auth.prototype.Recover_Password = function() {};
 
       Fire_Auth.prototype._Auth_Monitor = function(authData) {
+        var key, _results;
         if (authData) {
           this.user_id(authData.uid);
           return this._defaults.Once_Loaded((function(_this) {
@@ -107,7 +108,12 @@
             };
           })(this));
         } else {
-          return this.user_id(null);
+          this.user_id(null);
+          _results = [];
+          for (key in this.user) {
+            _results.push(this.user[key](null));
+          }
+          return _results;
         }
       };
 

@@ -58,13 +58,16 @@
         it('Should have a Login function', function() {
           return expect(_.isFunction(fire_auth.Login)).toBeTruthy();
         });
+        it('Should have a Logout function', function() {
+          return expect(_.isFunction(fire_auth.Logout)).toBeTruthy();
+        });
         it('Should have a Create_User function', function() {
           return expect(_.isFunction(fire_auth.Create_User)).toBeTruthy();
         });
         it('Should have a user object', function() {
           return expect(_.isObject(fire_auth.user)).toBeTruthy();
         });
-        return it('Should have a user id observable', function() {
+        return it('Should have a user_id observable', function() {
           return expect(fire_auth.user_id).toBeDefined();
         });
       });
@@ -92,7 +95,8 @@
             expires: Math.floor(new Date() / 1000) + 24 * 60 * 60,
             auth: {}
           });
-          return expect(fire_auth.valid()).toBeTruthy();
+          expect(fire_auth.valid()).toBeTruthy();
+          return expect(fire_auth.user_id()).toEqual('u001');
         });
         it('Should load the user\'s data from both public and private locations', function() {
           fire_ref.changeAuthState({
@@ -107,7 +111,7 @@
           expect(fire_auth.user.display_name()).toEqual("user");
           return expect(fire_auth.user.email()).toEqual(credentials.email);
         });
-        return it('If the user\'s data does not have some of the default values it should add them', function() {
+        it('If the user\'s data does not have some of the default values it should add them', function() {
           fire_ref.changeAuthState({
             uid: 'u002',
             provider: 'password',
@@ -124,13 +128,29 @@
           expect(fire_ref.child('users/public').child('u002').getData().picture).toEqual("me.png");
           return expect(fire_ref.child('users/private').child('u002').getData().awaiting_approvial).toEqual(true);
         });
-      });
-      xdescribe('Log out', function() {
-        beforeEach(function() {});
-        it('Should be able to logout a user', function() {});
-        it('Should flag that the user is not authorized', function() {});
-        it('Should clear the user\'s data', function() {});
-        return it('Should clear the user\'s uid', function() {});
+        return describe('Log out', function() {
+          beforeEach(function() {
+            fire_ref.changeAuthState({
+              uid: 'u001',
+              provider: 'password',
+              token: 'token',
+              expires: Math.floor(new Date() / 1000) + 24 * 60 * 60,
+              auth: {}
+            });
+            fire_auth.Logout();
+            return fire_ref.changeAuthState(null);
+          });
+          it('Should be able to logout a user', function() {
+            expect(fire_auth.valid()).toBeFalsy();
+            return expect(fire_auth.user_id()).toBeFalsy();
+          });
+          return it('Should clear the user\'s data', function() {
+            expect(fire_auth.user.picture()).toEqual(null);
+            expect(fire_auth.user.awaiting_approvial()).toEqual(null);
+            expect(fire_auth.user.display_name()).toEqual(null);
+            return expect(fire_auth.user.email()).toEqual(null);
+          });
+        });
       });
       xdescribe('Recover Password', function() {});
       xdescribe('Change profile', function() {});
