@@ -1,11 +1,12 @@
 define (require) ->
-  ko           = require 'knockout'
-  _            = require 'lodash'
+  ko              = require 'knockout'
+  _               = require 'lodash'
   
-  window.ko    = ko
-  MockFirebase = require('mockfirebase').MockFirebase
+  window.ko       = ko
+  MockFirebase    = require('mockfirebase').MockFirebase
   
-  Fire_Auth    = require 'fire_auth'
+  Fire_Auth_Class = require 'fire_auth_class'
+  Fire_Auth       = require 'fire_auth'
 
   describe 'Fire Auth', ->
     fire_ref = null
@@ -42,9 +43,12 @@ define (require) ->
 
     describe 'Exports', ->
       beforeEach ->
-        fire_auth = new Fire_Auth
-          fire_ref: fire_ref
+        fire_auth = Fire_Auth
       
+      it 'Should have a Setup function', ->
+        expect _.isFunction fire_auth.Setup
+          .toBeTruthy()
+
       it 'Should have a Login function', ->
         expect _.isFunction fire_auth.Login
           .toBeTruthy()
@@ -75,11 +79,12 @@ define (require) ->
 
       it 'Should have a reset_requested observable', ->
         expect fire_auth.reset_requested
-          .toBeDefined()
+          .toBeDefined()    
 
     describe 'User Login', ->
       beforeEach ->
-        fire_auth = new Fire_Auth
+        fire_auth = new Fire_Auth_Class()
+        fire_auth.Setup
           fire_ref: fire_ref
           public_keys:
             picture: null
@@ -161,7 +166,8 @@ define (require) ->
 
     describe 'Recover Password', ->
       beforeEach ->
-        fire_auth = new Fire_Auth
+        fire_auth = new Fire_Auth_Class()
+        fire_auth.Setup
           fire_ref: fire_ref
 
         fire_auth.Create_User
@@ -185,14 +191,12 @@ define (require) ->
           expires: Math.floor(new Date() / 1000) + 24 * 60 * 60
           auth: {}
 
-        expect(fire_auth.reset_requested()).toBeTruthy()
-
-
-    xdescribe 'Change profile', ->      
+        expect(fire_auth.reset_requested()).toBeTruthy()  
 
     describe 'Creating a User', ->
       beforeEach ->
-        fire_auth = new Fire_Auth
+        fire_auth = new Fire_Auth_Class()
+        fire_auth.Setup
           fire_ref: fire_ref
 
         fire_auth.Create_User

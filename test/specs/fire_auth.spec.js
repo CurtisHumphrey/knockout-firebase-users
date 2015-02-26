@@ -1,10 +1,11 @@
 (function() {
   define(function(require) {
-    var Fire_Auth, MockFirebase, ko, _;
+    var Fire_Auth, Fire_Auth_Class, MockFirebase, ko, _;
     ko = require('knockout');
     _ = require('lodash');
     window.ko = ko;
     MockFirebase = require('mockfirebase').MockFirebase;
+    Fire_Auth_Class = require('fire_auth_class');
     Fire_Auth = require('fire_auth');
     describe('Fire Auth', function() {
       var credentials, fire_auth, fire_ref;
@@ -52,9 +53,10 @@
       });
       describe('Exports', function() {
         beforeEach(function() {
-          return fire_auth = new Fire_Auth({
-            fire_ref: fire_ref
-          });
+          return fire_auth = new Fire_Auth_Class();
+        });
+        it('Should have a Setup function', function() {
+          return expect(_.isFunction(fire_auth.Setup)).toBeTruthy();
         });
         it('Should have a Login function', function() {
           return expect(_.isFunction(fire_auth.Login)).toBeTruthy();
@@ -83,7 +85,8 @@
       });
       describe('User Login', function() {
         beforeEach(function() {
-          fire_auth = new Fire_Auth({
+          fire_auth = new Fire_Auth_Class();
+          fire_auth.Setup({
             fire_ref: fire_ref,
             public_keys: {
               picture: null,
@@ -162,7 +165,8 @@
       });
       describe('Recover Password', function() {
         beforeEach(function() {
-          fire_auth = new Fire_Auth({
+          fire_auth = new Fire_Auth_Class();
+          fire_auth.Setup({
             fire_ref: fire_ref
           });
           return fire_auth.Create_User({
@@ -187,10 +191,10 @@
           return expect(fire_auth.reset_requested()).toBeTruthy();
         });
       });
-      xdescribe('Change profile', function() {});
       return describe('Creating a User', function() {
         beforeEach(function() {
-          fire_auth = new Fire_Auth({
+          fire_auth = new Fire_Auth_Class();
+          fire_auth.Setup({
             fire_ref: fire_ref
           });
           return fire_auth.Create_User({
