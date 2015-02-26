@@ -3,6 +3,7 @@ requirejs.config
     knockout: "../bower_components/knockout/dist/knockout.debug"
     lodash: "../bower_components/lodash/lodash.min"
     mockfirebase: "../bower_components/mockfirebase/browser/mockfirebase"
+    firebase: "firebase_mock"
 
     fire_value: "../dist/fire_value"
     fire_value_by_ref: "../dist/fire_value_by_ref"

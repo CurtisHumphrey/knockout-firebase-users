@@ -2,6 +2,7 @@ define (require) ->
   ko         = require 'knockout'
   Fire_Model_By_Ref = require 'fire_model_by_ref'
   require 'fire_value'
+  Firebase = require 'firebase'
 
 
   class Fire_Auth
@@ -10,12 +11,18 @@ define (require) ->
 
       @_public = options.public_keys ? {}
       @_private = options.private_keys ? {}
+      #always expect email on private
+      @_private.email ?= null
 
       @user = {}
 
       @user_id = ko.observable()
 
       @valid = ko.pureComputed => Boolean @user_id()
+
+      @reset_requested = ko.fireObservable false, 
+        read_once: true
+        read_only: true
 
       @fire_ref.onAuth @_Auth_Monitor
 
@@ -26,6 +33,14 @@ define (require) ->
       Fire_Model_By_Ref @user, @_private,
         fire_ref: @fire_ref.child('users/private')
         ref_obs_id: @user_id
+
+      #changes the reset_requested based on the current email
+      @user.email.subscribe (email) =>
+        return unless email #nv is an email
+        #set default
+        @reset_requested false
+        #check if exists
+        @reset_requested.Change_Fire_Ref @fire_ref.child('users/resets/' + email)
 
       @_defaults = ko.fireObservable null, 
         fire_ref: @fire_ref.child('users/defaults')
@@ -75,7 +90,14 @@ define (require) ->
     Change_User: =>
 
 
-    Recover_Password: =>
+    Recover_Password: (email) =>
+      @fire_ref.resetPassword
+        email: email
+      , (error) =>
+        unless error
+          @fire_ref.child('users/resets').child email
+            .set Firebase.ServerValue.TIMESTAMP
+
 
     _Auth_Monitor: (authData) =>
       if authData

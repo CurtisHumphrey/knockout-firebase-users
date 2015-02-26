@@ -2,10 +2,11 @@
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   define(function(require) {
-    var Fire_Auth, Fire_Model_By_Ref, ko;
+    var Fire_Auth, Fire_Model_By_Ref, Firebase, ko;
     ko = require('knockout');
     Fire_Model_By_Ref = require('fire_model_by_ref');
     require('fire_value');
+    Firebase = require('firebase');
     return Fire_Auth = (function() {
       function Fire_Auth(options) {
         this._Auth_Monitor = __bind(this._Auth_Monitor, this);
@@ -15,10 +16,13 @@
         this.Logout = __bind(this.Logout, this);
         this.Login = __bind(this.Login, this);
         this.Create_User = __bind(this.Create_User, this);
-        var _ref, _ref1;
+        var _base, _ref, _ref1;
         this.fire_ref = options.fire_ref;
         this._public = (_ref = options.public_keys) != null ? _ref : {};
         this._private = (_ref1 = options.private_keys) != null ? _ref1 : {};
+        if ((_base = this._private).email == null) {
+          _base.email = null;
+        }
         this.user = {};
         this.user_id = ko.observable();
         this.valid = ko.pureComputed((function(_this) {
@@ -26,6 +30,10 @@
             return Boolean(_this.user_id());
           };
         })(this));
+        this.reset_requested = ko.fireObservable(false, {
+          read_once: true,
+          read_only: true
+        });
         this.fire_ref.onAuth(this._Auth_Monitor);
         Fire_Model_By_Ref(this.user, this._public, {
           fire_ref: this.fire_ref.child('users/public'),
@@ -35,6 +43,15 @@
           fire_ref: this.fire_ref.child('users/private'),
           ref_obs_id: this.user_id
         });
+        this.user.email.subscribe((function(_this) {
+          return function(email) {
+            if (!email) {
+              return;
+            }
+            _this.reset_requested(false);
+            return _this.reset_requested.Change_Fire_Ref(_this.fire_ref.child('users/resets/' + email));
+          };
+        })(this));
         this._defaults = ko.fireObservable(null, {
           fire_ref: this.fire_ref.child('users/defaults'),
           read_once: true,
@@ -82,7 +99,17 @@
 
       Fire_Auth.prototype.Change_User = function() {};
 
-      Fire_Auth.prototype.Recover_Password = function() {};
+      Fire_Auth.prototype.Recover_Password = function(email) {
+        return this.fire_ref.resetPassword({
+          email: email
+        }, (function(_this) {
+          return function(error) {
+            if (!error) {
+              return _this.fire_ref.child('users/resets').child(email).set(Firebase.ServerValue.TIMESTAMP);
+            }
+          };
+        })(this));
+      };
 
       Fire_Auth.prototype._Auth_Monitor = function(authData) {
         var key, _results;

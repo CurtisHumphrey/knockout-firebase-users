@@ -27,6 +27,7 @@
                 awaiting_approvial: true
               }
             },
+            resets: null,
             "public": {
               u001: {
                 picture: "user.png",
@@ -61,14 +62,23 @@
         it('Should have a Logout function', function() {
           return expect(_.isFunction(fire_auth.Logout)).toBeTruthy();
         });
+        it('Should have a Recover_Password function', function() {
+          return expect(_.isFunction(fire_auth.Recover_Password)).toBeTruthy();
+        });
         it('Should have a Create_User function', function() {
           return expect(_.isFunction(fire_auth.Create_User)).toBeTruthy();
         });
         it('Should have a user object', function() {
           return expect(_.isObject(fire_auth.user)).toBeTruthy();
         });
-        return it('Should have a user_id observable', function() {
+        it('Should have a user_id observable', function() {
           return expect(fire_auth.user_id).toBeDefined();
+        });
+        it('Should have a valid observable', function() {
+          return expect(fire_auth.valid).toBeDefined();
+        });
+        return it('Should have a reset_requested observable', function() {
+          return expect(fire_auth.reset_requested).toBeDefined();
         });
       });
       describe('User Login', function() {
@@ -119,7 +129,6 @@
             expires: Math.floor(new Date() / 1000) + 24 * 60 * 60,
             auth: {}
           });
-          console.log(ko.toJS(fire_auth.user));
           expect(fire_auth.user.display_name()).toEqual("user");
           expect(fire_auth.user.is_admin()).toEqual(true);
           expect(fire_auth.user.email()).toEqual(credentials.email);
@@ -152,7 +161,33 @@
           });
         });
       });
-      xdescribe('Recover Password', function() {});
+      describe('Recover Password', function() {
+        beforeEach(function() {
+          fire_auth = new Fire_Auth({
+            fire_ref: fire_ref
+          });
+          return fire_auth.Create_User({
+            email: credentials.email,
+            password: credentials.password
+          });
+        });
+        it('Should flag that reset happened in firebase', function() {
+          fire_auth.Recover_Password(credentials.email);
+          return expect(fire_ref.child('users/resets/' + credentials.email).getData()).toBeTruthy();
+        });
+        return it('Should flag that a reset happened once they login again', function() {
+          fire_auth.Recover_Password(credentials.email);
+          fire_auth.Login(credentials);
+          fire_ref.changeAuthState({
+            uid: 'u001',
+            provider: 'password',
+            token: 'token',
+            expires: Math.floor(new Date() / 1000) + 24 * 60 * 60,
+            auth: {}
+          });
+          return expect(fire_auth.reset_requested()).toBeTruthy();
+        });
+      });
       xdescribe('Change profile', function() {});
       return describe('Creating a User', function() {
         beforeEach(function() {

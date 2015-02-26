@@ -25,6 +25,7 @@ define (require) ->
               picture: "me.png"
             private:
               awaiting_approvial: true
+          resets: null
           public:
             u001:
               picture: "user.png"
@@ -52,6 +53,10 @@ define (require) ->
         expect _.isFunction fire_auth.Logout
           .toBeTruthy()
 
+      it 'Should have a Recover_Password function', ->
+        expect _.isFunction fire_auth.Recover_Password
+          .toBeTruthy()
+
       it 'Should have a Create_User function', ->
         expect _.isFunction fire_auth.Create_User
           .toBeTruthy()
@@ -62,6 +67,14 @@ define (require) ->
 
       it 'Should have a user_id observable', ->
         expect fire_auth.user_id
+          .toBeDefined()
+
+      it 'Should have a valid observable', ->
+        expect fire_auth.valid
+          .toBeDefined()
+
+      it 'Should have a reset_requested observable', ->
+        expect fire_auth.reset_requested
           .toBeDefined()
 
     describe 'User Login', ->
@@ -111,8 +124,6 @@ define (require) ->
           expires: Math.floor(new Date() / 1000) + 24 * 60 * 60
           auth: {}
 
-        console.log ko.toJS fire_auth.user
-
         #has
         expect( fire_auth.user.display_name()).toEqual "user"
         expect( fire_auth.user.is_admin()).toEqual true
@@ -151,7 +162,33 @@ define (require) ->
           expect( fire_auth.user.display_name()).toEqual null
           expect( fire_auth.user.email()).toEqual null
 
-    xdescribe 'Recover Password', ->
+    describe 'Recover Password', ->
+      beforeEach ->
+        fire_auth = new Fire_Auth
+          fire_ref: fire_ref
+
+        fire_auth.Create_User
+          email: credentials.email
+          password: credentials.password
+
+      it 'Should flag that reset happened in firebase', ->
+        fire_auth.Recover_Password credentials.email
+
+        expect(fire_ref.child('users/resets/'+credentials.email).getData()).toBeTruthy()
+
+      it 'Should flag that a reset happened once they login again', ->
+        fire_auth.Recover_Password credentials.email
+
+        fire_auth.Login credentials
+
+        fire_ref.changeAuthState
+          uid: 'u001'
+          provider: 'password'
+          token: 'token'
+          expires: Math.floor(new Date() / 1000) + 24 * 60 * 60
+          auth: {}
+
+        expect(fire_auth.reset_requested()).toBeTruthy()
 
 
     xdescribe 'Change profile', ->      
