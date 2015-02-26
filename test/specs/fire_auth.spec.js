@@ -53,7 +53,7 @@
       });
       describe('Exports', function() {
         beforeEach(function() {
-          return fire_auth = new Fire_Auth_Class();
+          return fire_auth = Fire_Auth;
         });
         it('Should have a Setup function', function() {
           return expect(_.isFunction(fire_auth.Setup)).toBeTruthy();
