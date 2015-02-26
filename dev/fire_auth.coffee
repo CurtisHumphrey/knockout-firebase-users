@@ -82,6 +82,7 @@ define (require) ->
 
 
     Logout: =>
+      @fire_ref.unauth()
 
 
     Change_User_Type: =>

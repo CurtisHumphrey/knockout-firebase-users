@@ -93,7 +93,9 @@
         })(this));
       };
 
-      Fire_Auth.prototype.Logout = function() {};
+      Fire_Auth.prototype.Logout = function() {
+        return this.fire_ref.unauth();
+      };
 
       Fire_Auth.prototype.Change_User_Type = function() {};
 

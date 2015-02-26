@@ -148,9 +148,6 @@ define (require) ->
 
           fire_auth.Logout()
 
-          fire_ref.changeAuthState null
-
-
         it 'Should be able to logout a user', ->
           expect(fire_auth.valid()).toBeFalsy()
           expect(fire_auth.user_id()).toBeFalsy()

@@ -146,8 +146,7 @@
               expires: Math.floor(new Date() / 1000) + 24 * 60 * 60,
               auth: {}
             });
-            fire_auth.Logout();
-            return fire_ref.changeAuthState(null);
+            return fire_auth.Logout();
           });
           it('Should be able to logout a user', function() {
             expect(fire_auth.valid()).toBeFalsy();
