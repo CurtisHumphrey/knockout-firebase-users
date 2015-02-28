@@ -1,9 +1,7 @@
 define (require) ->
   ko         = require 'knockout'
   
-  require 'fire_model_by_ref'
-  require 'fire_value'
-  require 'fire_list'
+  require 'knockout_firebase'
 
   Firebase = require 'firebase'
 

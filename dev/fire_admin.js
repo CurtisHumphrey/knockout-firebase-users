@@ -4,7 +4,7 @@
   define(function(require) {
     var Fire_Admin, ko;
     ko = require('knockout');
-    require('fire_list');
+    require('knockout_firebase');
     return Fire_Admin = (function() {
       function Fire_Admin(options) {
         this.Get_Users_Data = __bind(this.Get_Users_Data, this);

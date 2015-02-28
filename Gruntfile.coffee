@@ -12,7 +12,7 @@ module.exports = (grunt) ->
           port: 9001
           hostname: 'localhost',
           middleware: ( connect ) ->
-            [lrSnippet, mountFolder(connect, '.'), mountFolder(connect, '../knockout-firebase')]
+            [lrSnippet, mountFolder(connect, '.')]
 
     open:
       test:
@@ -29,7 +29,7 @@ module.exports = (grunt) ->
             requireConfigFile: "dev/require_config.js"
             requireConfig:
               baseUrl: 'dev'
-
+          
     exec:
       git:
         cmd: 'START "" "C:\\Program Files\\TortoiseGit\\bin\\TortoiseGitProc.exe" /command:log /path:..'
@@ -52,8 +52,10 @@ module.exports = (grunt) ->
       dist:
         expand: true
         flatten: true
-        src   : ['dev/fire_*.js']
+        src   : ['dev/fire_*.js','dev/knockout_firebase.js']
         dest  : 'dist/'
+
+
 
     watch:
       configFiles:
@@ -82,4 +84,5 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'rerun', ['coffee', 'connect:dev:livereload', 'watch']
   grunt.registerTask 'dev', ['coffee', 'connect:dev:livereload', 'open', 'watch']
+  grunt.registerTask 'build', ['coffee','jasmine','copy']
   grunt.registerTask 'default', ['git', 'dev']

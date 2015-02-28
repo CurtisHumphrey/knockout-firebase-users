@@ -4,9 +4,7 @@
   define(function(require) {
     var Fire_Auth_Class, Firebase, ko;
     ko = require('knockout');
-    require('fire_model_by_ref');
-    require('fire_value');
-    require('fire_list');
+    require('knockout_firebase');
     Firebase = require('firebase');
     return Fire_Auth_Class = (function() {
       function Fire_Auth_Class() {

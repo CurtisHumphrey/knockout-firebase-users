@@ -1,7 +1,7 @@
 define (require) ->
   ko         = require 'knockout'
   
-  require 'fire_list'
+  require 'knockout_firebase'
 
 
   class Fire_Admin
