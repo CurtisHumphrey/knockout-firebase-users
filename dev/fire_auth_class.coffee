@@ -13,6 +13,9 @@ define (require) ->
       @user_id = ko.observable()
 
       @valid = ko.pureComputed => Boolean @user_id()
+      @checking = ko.observable false
+
+      @error = ko.observable ''
 
       @reset_requested = ko.fireObservable false, 
         read_once: true
@@ -49,20 +52,29 @@ define (require) ->
         read_once: true
         read_only: true
 
-    Create_User: (info) =>
+    Create_User: (info, callback) =>
+      info.new_private ?= {}
+      info.new_private.email ?= info.email #force this condition
+
       @fire_ref.createUser
         email: info.email
         password: info.password
       , (error, userData) =>
+        if error or not userData?
+          @error error
+          console.error error 
+          return
         fire_ref = @fire_ref
 
         #setup defaults
         @_defaults.Once_Loaded (defaults) =>
-          fire_ref.child('users/public').child(userData.uid)
-            .update defaults.public
+          if defaults?.public?
+            fire_ref.child('users/public').child(userData.uid)
+              .update defaults.public
 
-          fire_ref.child('users/private').child(userData.uid)
-            .update defaults.private
+          if defaults?.private?
+            fire_ref.child('users/private').child(userData.uid)
+              .update defaults.private
 
           if info.new_public
             fire_ref.child('users/public').child(userData.uid)
@@ -73,23 +85,22 @@ define (require) ->
               .update info.new_private
 
           return
+
+        callback? userData
       return
 
     Login: (credentials) =>
+      @checking true
       @fire_ref.authWithPassword credentials, (error, authData) =>
+        @checking false
         if error
+          @error error
           console.error "Login Failed!", error
-        else
+        #else
           #Auth_Monitor should handle this
-
 
     Logout: =>
       @fire_ref.unauth()
-
-
-    Admin_Get_Users: =>
-
-
 
     Recover_Password: (email) =>
       @fire_ref.resetPassword
@@ -98,7 +109,6 @@ define (require) ->
         unless error
           @fire_ref.child('users/resets').child email
             .set Firebase.ServerValue.TIMESTAMP
-
 
     _Auth_Monitor: (authData) =>
       if authData
@@ -112,8 +122,6 @@ define (require) ->
           for key, value of defaults.public
             if @user[key] and @user[key]() is null
               @user[key] value
-                 
-
           return
       else
         @user_id null

@@ -49,7 +49,15 @@ define (require) ->
       beforeEach ->
         fire_admin = new Fire_Admin
           fire_ref: fire_ref
-        users = fire_admin.Get_Users_Data()
+        users = fire_admin.Get_Users_Data
+          public:
+            picture: ""
+            display_name: ""
+          private:
+            awaiting_approvial: true
+            is_admin: false
+            email: ""
+
 
         console.log users()
         

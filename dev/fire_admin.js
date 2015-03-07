@@ -24,6 +24,7 @@
           if ((_base = this._all_users)[_name = model._key] == null) {
             _base[_name] = {};
           }
+          this._all_users[model._key]._public = true;
           for (key in model) {
             if (key === '_key' || this._all_users[model._key][key]) {
               continue;
@@ -37,6 +38,7 @@
           if ((_base1 = this._all_users)[_name1 = model._key] == null) {
             _base1[_name1] = {};
           }
+          this._all_users[model._key]._private = true;
           for (key in model) {
             if (key === '_key' || this._all_users[model._key][key]) {
               continue;
@@ -46,26 +48,22 @@
         }
         all_users = [];
         for (key in this._all_users) {
+          if (!(this._all_users[key]._public && this._all_users[key]._private)) {
+            continue;
+          }
           all_users.push(this._all_users[key]);
         }
         return all_users;
       };
 
-      Fire_Admin.prototype.Get_Users_Data = function() {
+      Fire_Admin.prototype.Get_Users_Data = function(keys_inits) {
         this._all_public = ko.fireList({
           fire_ref: this.fire_ref.child('users/public'),
-          keys_inits: {
-            picture: "",
-            display_name: ""
-          }
+          keys_inits: keys_inits["public"]
         });
         this._all_private = ko.fireList({
           fire_ref: this.fire_ref.child('users/private'),
-          keys_inits: {
-            awaiting_approvial: true,
-            is_admin: false,
-            email: ""
-          }
+          keys_inits: keys_inits["private"]
         });
         this.all_users = ko.computed(this._All_Users_Computed);
         return this.all_users;

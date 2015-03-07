@@ -77,7 +77,10 @@
           return expect(fire_auth.user_id).toBeDefined();
         });
         it('Should have a valid observable', function() {
-          return expect(fire_auth.valid).toBeDefined();
+          return expect(ko.isObservable(fire_auth.valid)).toBeTruthy();
+        });
+        it('Should have a checking observable', function() {
+          return expect(ko.isObservable(fire_auth.checking)).toBeTruthy();
         });
         return it('Should have a reset_requested observable', function() {
           return expect(fire_auth.reset_requested).toBeDefined();
@@ -101,6 +104,7 @@
           return fire_auth.Login(credentials);
         });
         it('Should be able to login a user', function() {
+          expect(fire_auth.valid()).toBeFalsy();
           fire_ref.changeAuthState({
             uid: 'u001',
             provider: 'password',
@@ -110,6 +114,17 @@
           });
           expect(fire_auth.valid()).toBeTruthy();
           return expect(fire_auth.user_id()).toEqual('u001');
+        });
+        it('Should be report "checking" as true until login is complete', function() {
+          expect(fire_auth.checking()).toBeTruthy();
+          fire_ref.changeAuthState({
+            uid: 'u001',
+            provider: 'password',
+            token: 'token',
+            expires: Math.floor(new Date() / 1000) + 24 * 60 * 60,
+            auth: {}
+          });
+          return expect(fire_auth.checking()).toBeFalsy();
         });
         it('Should load the user\'s data from both public and private locations', function() {
           fire_ref.changeAuthState({

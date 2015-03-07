@@ -74,8 +74,12 @@ define (require) ->
           .toBeDefined()
 
       it 'Should have a valid observable', ->
-        expect fire_auth.valid
-          .toBeDefined()
+        expect ko.isObservable(fire_auth.valid)
+          .toBeTruthy()
+
+      it 'Should have a checking observable', ->
+        expect ko.isObservable(fire_auth.checking)
+          .toBeTruthy()
 
       it 'Should have a reset_requested observable', ->
         expect fire_auth.reset_requested
@@ -97,6 +101,7 @@ define (require) ->
         fire_auth.Login credentials
 
       it 'Should be able to login a user', ->
+        expect(fire_auth.valid()).toBeFalsy()
         fire_ref.changeAuthState
           uid: 'u001'
           provider: 'password'
@@ -106,6 +111,17 @@ define (require) ->
 
         expect(fire_auth.valid()).toBeTruthy()
         expect(fire_auth.user_id()).toEqual('u001')
+
+      it 'Should be report "checking" as true until login is complete', ->
+        expect(fire_auth.checking()).toBeTruthy()
+        fire_ref.changeAuthState
+          uid: 'u001'
+          provider: 'password'
+          token: 'token'
+          expires: Math.floor(new Date() / 1000) + 24 * 60 * 60
+          auth: {}
+
+        expect(fire_auth.checking()).toBeFalsy()
 
       it 'Should load the user\'s data from both public and private locations', ->
         fire_ref.changeAuthState

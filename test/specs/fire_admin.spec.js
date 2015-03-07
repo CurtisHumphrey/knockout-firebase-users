@@ -57,7 +57,17 @@
           fire_admin = new Fire_Admin({
             fire_ref: fire_ref
           });
-          users = fire_admin.Get_Users_Data();
+          users = fire_admin.Get_Users_Data({
+            "public": {
+              picture: "",
+              display_name: ""
+            },
+            "private": {
+              awaiting_approvial: true,
+              is_admin: false,
+              email: ""
+            }
+          });
           return console.log(users());
         });
         it('Should be able to list all the users', function() {

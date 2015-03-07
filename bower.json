@@ -24,7 +24,7 @@
   "devDependencies": {
     "knockout": "~3.2.0",
     "lodash": "~3.2.0",
-    "mockfirebase": "~0.10.2",
-    "knockout-firebase": "~1.0.0"
+    "mockfirebase": "git://github.com/CurtisHumphrey/mockfirebase.git",
+    "knockout-firebase": "~1.0.1"
   }
 }

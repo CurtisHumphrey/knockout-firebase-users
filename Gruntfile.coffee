@@ -1,6 +1,6 @@
 module.exports = (grunt) ->
   # Livereload and connect variables
-  LIVERELOAD_PORT = 1337
+  LIVERELOAD_PORT = 1338
   lrSnippet = require("connect-livereload")(port: LIVERELOAD_PORT)
   mountFolder = (connect, dir) ->
     connect.static require("path").resolve(dir)
@@ -9,7 +9,7 @@ module.exports = (grunt) ->
     connect:
       dev:
         options:
-          port: 9001
+          port: 9002
           hostname: 'localhost',
           middleware: ( connect ) ->
             [lrSnippet, mountFolder(connect, '.')]
@@ -29,10 +29,19 @@ module.exports = (grunt) ->
             requireConfigFile: "dev/require_config.js"
             requireConfig:
               baseUrl: 'dev'
-          
+    
+    requirejs:
+      compile:
+        options:
+          baseUrl: 'dev'
+          mainConfigFile: 'dev/require_config_build.js'
+          out: "dist/knockout_firebase_users.js"
+          name: "knockout_firebase_users"
+          optimize: 'none'
+
     exec:
       git:
-        cmd: 'START "" "C:\\Program Files\\TortoiseGit\\bin\\TortoiseGitProc.exe" /command:log /path:..'
+        cmd: 'START "" "C:\\Program Files\\TortoiseGit\\bin\\TortoiseGitProc.exe" /command:log /path:.'
 
     coffee:
       compile_tests: 
@@ -48,15 +57,6 @@ module.exports = (grunt) ->
         dest   : 'dev'
         ext    : '.js'
 
-    copy:
-      dist:
-        expand: true
-        flatten: true
-        src   : ['dev/fire_*.js','dev/knockout_firebase.js']
-        dest  : 'dist/'
-
-
-
     watch:
       configFiles:
         files: ['Gruntfile.coffee']
@@ -64,17 +64,15 @@ module.exports = (grunt) ->
           reload: true
       reload_jasmine:
         files: ['test/specs/**/*.js','dev/**/*.js']
-        tasks: ['jasmine:dev', 'copy']
+        tasks: ['jasmine:dev', 'requirejs']
         options:
-          livereload: 1337
+          livereload: 1338
       coffee_spec:
         files: ['test/specs/**/*.coffee']
         tasks: ['newer:coffee:compile_tests']
       coffee_lib:
         files: ['dev/**/*.coffee']
         tasks: ['newer:coffee:compile_lib']
-        options:
-          livereload: 35729
 
   require('time-grunt')(grunt)
 
@@ -84,5 +82,5 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'rerun', ['coffee', 'connect:dev:livereload', 'watch']
   grunt.registerTask 'dev', ['coffee', 'connect:dev:livereload', 'open', 'watch']
-  grunt.registerTask 'build', ['coffee','jasmine','copy']
+  grunt.registerTask 'build', ['coffee','jasmine','requirejs']
   grunt.registerTask 'default', ['git', 'dev']
