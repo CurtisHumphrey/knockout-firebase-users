@@ -91,11 +91,11 @@
           fire_auth = new Fire_Auth_Class();
           fire_auth.Setup({
             fire_ref: fire_ref,
-            public_keys: {
+            "public": {
               picture: null,
               display_name: null
             },
-            private_keys: {
+            "private": {
               email: null,
               awaiting_approvial: null,
               is_admin: null
@@ -191,7 +191,7 @@
         });
         it('Should flag that reset happened in firebase', function() {
           fire_auth.Recover_Password(credentials.email);
-          return expect(fire_ref.child('users/resets/' + credentials.email).getData()).toBeTruthy();
+          return expect(fire_ref.child('users/resets/' + credentials.email.replace('.', '')).getData()).toBeTruthy();
         });
         return it('Should flag that a reset happened once they login again', function() {
           fire_auth.Recover_Password(credentials.email);

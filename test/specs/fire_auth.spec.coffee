@@ -90,10 +90,10 @@ define (require) ->
         fire_auth = new Fire_Auth_Class()
         fire_auth.Setup
           fire_ref: fire_ref
-          public_keys:
+          public:
             picture: null
             display_name: null
-          private_keys:
+          private:
             email: null
             awaiting_approvial: null
             is_admin: null
@@ -193,7 +193,7 @@ define (require) ->
       it 'Should flag that reset happened in firebase', ->
         fire_auth.Recover_Password credentials.email
 
-        expect(fire_ref.child('users/resets/'+credentials.email).getData()).toBeTruthy()
+        expect(fire_ref.child('users/resets/'+credentials.email.replace('.','')).getData()).toBeTruthy()
 
       it 'Should flag that a reset happened once they login again', ->
         fire_auth.Recover_Password credentials.email

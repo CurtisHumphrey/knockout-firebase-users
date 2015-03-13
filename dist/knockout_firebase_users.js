@@ -32,12 +32,11 @@
       Fire_Auth_Class.prototype.Setup = function(options) {
         var private_keys, public_keys, _ref, _ref1;
         this.fire_ref = options.fire_ref;
-        public_keys = (_ref = options.public_keys) != null ? _ref : {};
-        private_keys = (_ref1 = options.private_keys) != null ? _ref1 : {};
+        public_keys = (_ref = options["public"]) != null ? _ref : {};
+        private_keys = (_ref1 = options["private"]) != null ? _ref1 : {};
         if (private_keys.email == null) {
           private_keys.email = null;
         }
-        this.fire_ref.onAuth(this._Auth_Monitor);
         ko.fireModelByRef(this.user, public_keys, {
           fire_ref: this.fire_ref.child('users/public'),
           ref_obs_id: this.user_id
@@ -52,14 +51,16 @@
               return;
             }
             _this.reset_requested(false);
+            email = email.replace('.', '');
             return _this.reset_requested.Change_Fire_Ref(_this.fire_ref.child('users/resets/' + email));
           };
         })(this));
-        return this._defaults = ko.fireObservable(null, {
+        this._defaults = ko.fireObservable(null, {
           fire_ref: this.fire_ref.child('users/defaults'),
           read_once: true,
           read_only: true
         });
+        return this.fire_ref.onAuth(this._Auth_Monitor);
       };
 
       Fire_Auth_Class.prototype.Create_User = function(info, callback) {
@@ -103,7 +104,7 @@
 
       Fire_Auth_Class.prototype.Login = function(credentials) {
         this.checking(true);
-        return this.fire_ref.authWithPassword(credentials, (function(_this) {
+        return this.fire_ref.authWithPassword(ko.toJS(credentials), (function(_this) {
           return function(error, authData) {
             _this.checking(false);
             if (error) {
@@ -124,6 +125,7 @@
         }, (function(_this) {
           return function(error) {
             if (!error) {
+              email = email.replace('.', '');
               return _this.fire_ref.child('users/resets').child(email).set(Firebase.ServerValue.TIMESTAMP);
             }
           };
@@ -137,14 +139,14 @@
           return this._defaults.Once_Loaded((function(_this) {
             return function(defaults) {
               var key, value, _ref, _ref1;
-              _ref = defaults["private"];
+              _ref = defaults != null ? defaults["private"] : void 0;
               for (key in _ref) {
                 value = _ref[key];
                 if (_this.user[key] && _this.user[key]() === null) {
                   _this.user[key](value);
                 }
               }
-              _ref1 = defaults["public"];
+              _ref1 = defaults != null ? defaults["public"] : void 0;
               for (key in _ref1) {
                 value = _ref1[key];
                 if (_this.user[key] && _this.user[key]() === null) {

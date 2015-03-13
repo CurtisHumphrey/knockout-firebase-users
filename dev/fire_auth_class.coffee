@@ -24,12 +24,10 @@ define (require) ->
     Setup: (options) =>
       @fire_ref = options.fire_ref
 
-      public_keys = options.public_keys ? {}
-      private_keys = options.private_keys ? {}
+      public_keys = options.public ? {}
+      private_keys = options.private ? {}
       #always expect email on private
       private_keys.email ?= null
-
-      @fire_ref.onAuth @_Auth_Monitor
 
       ko.fireModelByRef @user, public_keys,
         fire_ref: @fire_ref.child('users/public')
@@ -45,12 +43,15 @@ define (require) ->
         #set default
         @reset_requested false
         #check if exists
+        email = email.replace('.','')
         @reset_requested.Change_Fire_Ref @fire_ref.child('users/resets/' + email)
 
       @_defaults = ko.fireObservable null, 
         fire_ref: @fire_ref.child('users/defaults')
         read_once: true
         read_only: true
+
+      @fire_ref.onAuth @_Auth_Monitor
 
     Create_User: (info, callback) =>
       info.new_private ?= {}
@@ -91,7 +92,7 @@ define (require) ->
 
     Login: (credentials) =>
       @checking true
-      @fire_ref.authWithPassword credentials, (error, authData) =>
+      @fire_ref.authWithPassword ko.toJS(credentials), (error, authData) =>
         @checking false
         if error
           @error error
@@ -107,6 +108,7 @@ define (require) ->
         email: email
       , (error) =>
         unless error
+          email = email.replace('.','')
           @fire_ref.child('users/resets').child email
             .set Firebase.ServerValue.TIMESTAMP
 
@@ -115,11 +117,11 @@ define (require) ->
         @user_id authData.uid
 
         @_defaults.Once_Loaded (defaults) =>
-          for key, value of defaults.private
+          for key, value of defaults?.private
             if @user[key] and @user[key]() is null
               @user[key] value
 
-          for key, value of defaults.public
+          for key, value of defaults?.public
             if @user[key] and @user[key]() is null
               @user[key] value
           return
