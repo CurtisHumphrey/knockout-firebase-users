@@ -110,6 +110,8 @@
             if (error) {
               _this.error(error);
               return console.error("Login Failed!", error);
+            } else {
+              return _this.error('');
             }
           };
         })(this));

@@ -97,7 +97,8 @@ define (require) ->
         if error
           @error error
           console.error "Login Failed!", error
-        #else
+        else
+          @error ''
           #Auth_Monitor should handle this
 
     Logout: =>
