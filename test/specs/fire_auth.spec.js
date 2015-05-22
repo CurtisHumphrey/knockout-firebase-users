@@ -156,7 +156,12 @@
           return expect(fire_ref.child('users/private').child('u002').getData().awaiting_approvial).toEqual(true);
         });
         return describe('Log out', function() {
+          var private_data, public_data;
+          public_data = null;
+          private_data = null;
           beforeEach(function() {
+            public_data = fire_ref.child('users/public/u001').getData();
+            private_data = fire_ref.child('users/private/u001').getData();
             fire_ref.changeAuthState({
               uid: 'u001',
               provider: 'password',
@@ -170,11 +175,16 @@
             expect(fire_auth.valid()).toBeFalsy();
             return expect(fire_auth.user_id()).toBeFalsy();
           });
-          return it('Should clear the user\'s data', function() {
+          it('Should clear the user\'s data', function() {
             expect(fire_auth.user.picture()).toEqual(null);
             expect(fire_auth.user.awaiting_approvial()).toEqual(null);
             expect(fire_auth.user.display_name()).toEqual(null);
             return expect(fire_auth.user.email()).toEqual(null);
+          });
+          return it('Should not clear the DB values', function() {
+            expect(fire_ref.child('users/public/u001').getData()).toBeDefined();
+            expect(fire_ref.child('users/public/u001').getData()).toEqual(public_data);
+            return expect(fire_ref.child('users/private/u001').getData()).toEqual(private_data);
           });
         });
       });

@@ -159,7 +159,13 @@ define (require) ->
 
 
       describe 'Log out', ->
+        public_data = null
+        private_data = null
+
         beforeEach ->
+          public_data =  fire_ref.child('users/public/u001').getData()
+          private_data = fire_ref.child('users/private/u001').getData()
+
           fire_ref.changeAuthState
             uid: 'u001'
             provider: 'password'
@@ -179,6 +185,14 @@ define (require) ->
 
           expect( fire_auth.user.display_name()).toEqual null
           expect( fire_auth.user.email()).toEqual null
+
+        it 'Should not clear the DB values', ->
+          expect( fire_ref.child('users/public/u001').getData()).toBeDefined()
+
+          expect fire_ref.child('users/public/u001').getData()
+            .toEqual public_data
+          expect fire_ref.child('users/private/u001').getData()
+            .toEqual private_data
 
     describe 'Recover Password', ->
       beforeEach ->

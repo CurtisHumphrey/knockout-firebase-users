@@ -129,4 +129,5 @@ define (require) ->
       else
         @user_id null
         @user[key] null for key of @user
+      return
 

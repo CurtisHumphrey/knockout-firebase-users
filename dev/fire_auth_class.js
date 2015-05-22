@@ -135,10 +135,10 @@
       };
 
       Fire_Auth_Class.prototype._Auth_Monitor = function(authData) {
-        var key, _results;
+        var key;
         if (authData) {
           this.user_id(authData.uid);
-          return this._defaults.Once_Loaded((function(_this) {
+          this._defaults.Once_Loaded((function(_this) {
             return function(defaults) {
               var key, value, _ref, _ref1;
               _ref = defaults != null ? defaults["private"] : void 0;
@@ -159,11 +159,9 @@
           })(this));
         } else {
           this.user_id(null);
-          _results = [];
           for (key in this.user) {
-            _results.push(this.user[key](null));
+            this.user[key](null);
           }
-          return _results;
         }
       };
 
