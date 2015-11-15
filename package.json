@@ -2,7 +2,7 @@
   "name": "knockout-firebase-users",
   "version": "0.1.0",
   "description": "A library to manage users and their data using firebase and knockout",
-  "main": "dist/knockout_firebase_users.js"
+  "main": "dist/knockout_firebase_users.js",
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.2",
